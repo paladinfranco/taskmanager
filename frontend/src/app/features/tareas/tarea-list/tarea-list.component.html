@@ -1,0 +1,68 @@
+<div class="tarea-list-wrap">
+  <div class="list-header">
+    <button class="btn btn-sm btn-primary" (click)="showForm = true">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nueva tarea
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="empty-state">Cargando tareas...</div>
+
+  <div *ngIf="!loading && tareas.length === 0" class="empty-state">
+    Sin tareas asignadas. ¡Crea la primera!
+  </div>
+
+  <div class="task-items">
+    <div *ngFor="let t of tareas" class="task-item" [class.done]="t.estado === 'completada'">
+      <div class="task-check" [class.checked]="t.estado === 'completada'" (click)="toggle(t)">
+        <svg *ngIf="t.estado === 'completada'" width="9" height="9" viewBox="0 0 12 12" fill="none">
+          <polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="task-body">
+        <span class="task-title">{{ t.titulo }}</span>
+        <span class="task-desc" *ngIf="t.descripcion">{{ t.descripcion }}</span>
+      </div>
+      <span class="badge" [class.badge-pendiente]="t.estado === 'pendiente'" [class.badge-completada]="t.estado === 'completada'">
+        {{ t.estado }}
+      </span>
+      <div class="task-actions">
+        <button class="btn btn-icon" style="color:#6366f1;border-color:#a5b4fc" title="Reasignar" (click)="openReasignar(t)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/>
+            <path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/>
+          </svg>
+        </button>
+        <button class="btn btn-icon btn-danger" title="Eliminar" (click)="askDelete(t)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-tarea-form *ngIf="showForm"
+  [usuarioId]="usuarioId"
+  (saved)="onFormSaved()"
+  (cancelled)="showForm = false">
+</app-tarea-form>
+
+<app-confirm-dialog
+  [visible]="confirmDelete"
+  title="¿Eliminar tarea?"
+  [message]="'Se eliminará: ' + (tareaToDelete?.titulo || '') + '. Esta acción no se puede deshacer.'"
+  (confirmed)="doDelete()"
+  (cancelled)="confirmDelete = false">
+</app-confirm-dialog>
+
+<app-tarea-reasignar-modal *ngIf="showReasignar && tareaToReasignar"
+  [tarea]="tareaToReasignar"
+  [usuarios]="usuarios"
+  (reasignado)="onReasignado()"
+  (cancelled)="showReasignar = false">
+</app-tarea-reasignar-modal>
