@@ -31,7 +31,7 @@ export class UsuarioFormComponent implements OnInit {
       estado: [this.usuario?.estado || 'activo'],
       telefonos: this.fb.array(
         this.usuario?.telefonos?.map(t =>
-          this.fb.group({ telefono: [t.telefono, Validators.required], tipo: [t.tipo] })
+          this.fb.group({ telefono: [t.telefono, [Validators.required, Validators.pattern('^09[0-9]{8}$')]], tipo: [t.tipo] })
         ) || []
       )
     });
@@ -40,7 +40,7 @@ export class UsuarioFormComponent implements OnInit {
   get telefonos(): FormArray { return this.form.get('telefonos') as FormArray; }
 
   addTelefono(): void {
-    this.telefonos.push(this.fb.group({ telefono: ['', Validators.required], tipo: ['principal'] }));
+    this.telefonos.push(this.fb.group({ telefono: ['', [Validators.required, Validators.pattern('^09[0-9]{8}$')]], tipo: ['principal'] }));
   }
 
   removeTelefono(i: number): void { this.telefonos.removeAt(i); }
@@ -64,6 +64,17 @@ export class UsuarioFormComponent implements OnInit {
         this.saving = false;
       }
     });
+  }
+
+  soloNumeros(event: KeyboardEvent): boolean {
+    return /[0-9]/.test(event.key);
+  }
+
+  bloquearPaste(event: ClipboardEvent): void {
+    const texto = event.clipboardData?.getData('text') || '';
+    if (!/^[0-9]+$/.test(texto)) {
+      event.preventDefault();
+    }
   }
 
   hasError(field: string): boolean {
