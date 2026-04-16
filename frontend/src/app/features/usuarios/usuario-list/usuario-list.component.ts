@@ -17,6 +17,7 @@ export class UsuarioListComponent implements OnInit {
   usuarioToDelete: Usuario | null = null;
   activeTab: 'tareas' | 'historial' = 'tareas';
   loading = false;
+  currentYear = new Date().getFullYear();
 
   constructor(
     private usuarioService: UsuarioService,

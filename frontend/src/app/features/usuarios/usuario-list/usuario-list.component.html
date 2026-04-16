@@ -12,6 +12,7 @@
     </div>
     <span class="topbar-title">TaskManager Pro</span>
     <div class="topbar-spacer"></div>
+    <app-clock></app-clock>
     <app-theme-toggle></app-theme-toggle>
   </div>
 
@@ -21,7 +22,6 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-header">Usuarios</div>
-
       <div class="user-list">
         <div *ngFor="let u of usuarios"
              class="user-row"
@@ -39,7 +39,6 @@
           </span>
         </div>
       </div>
-
       <div class="divider"></div>
       <button class="add-user-btn" (click)="openCreate()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -52,7 +51,6 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="content" *ngIf="selectedUsuario; else noSelection">
 
-      <!-- Header del usuario -->
       <div class="content-header">
         <div class="user-profile">
           <div class="avatar avatar-lg">{{ getInitials(selectedUsuario.nombre) }}</div>
@@ -79,7 +77,6 @@
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="stats-row">
         <div class="stat-card">
           <span class="stat-value">{{ selectedUsuario.totalTareas }}</span>
@@ -95,13 +92,11 @@
         </div>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs-bar">
         <button class="tab-btn" [class.active]="activeTab === 'tareas'" (click)="activeTab = 'tareas'">Tareas</button>
         <button class="tab-btn" [class.active]="activeTab === 'historial'" (click)="activeTab = 'historial'">Historial de reasignaciones</button>
       </div>
 
-      <!-- Tab: Tareas -->
       <app-tarea-list
         *ngIf="activeTab === 'tareas'"
         [usuarioId]="selectedUsuario.id"
@@ -109,7 +104,6 @@
         (tareaChanged)="loadUsuarios()">
       </app-tarea-list>
 
-      <!-- Tab: Historial -->
       <app-tarea-reasignar
         *ngIf="activeTab === 'historial'"
         [usuarioId]="selectedUsuario.id">
@@ -123,9 +117,15 @@
       </main>
     </ng-template>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    Departamento de Inteligencia Artificial — {{ currentYear }}
+  </footer>
+
 </div>
 
-<!-- Formulario usuario modal -->
+<!-- Modales -->
 <app-usuario-form
   *ngIf="showUsuarioForm"
   [usuario]="editingUsuario"
@@ -133,7 +133,6 @@
   (cancelled)="onFormCancelled()">
 </app-usuario-form>
 
-<!-- Confirm delete -->
 <app-confirm-dialog
   [visible]="confirmDelete"
   title="¿Eliminar usuario?"
