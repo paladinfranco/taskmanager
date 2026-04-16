@@ -32,7 +32,9 @@
             <span class="user-name">{{ u.nombre }}</span>
             <span class="user-city">{{ u.ciudad }}</span>
           </div>
-          <span class="badge" [class.badge-activo]="u.estado === 'activo'" [class.badge-inactivo]="u.estado === 'inactivo'">
+          <span class="badge"
+            [class.badge-activo]="u.estado === 'activo'"
+            [class.badge-inactivo]="u.estado === 'inactivo'">
             {{ u.estado }}
           </span>
         </div>
@@ -74,12 +76,6 @@
             </svg>
             Eliminar
           </button>
-          <button class="btn btn-sm btn-primary" (click)="activeTab = 'tareas'">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nueva tarea
-          </button>
         </div>
       </div>
 
@@ -106,14 +102,16 @@
       </div>
 
       <!-- Tab: Tareas -->
-      <app-tarea-list *ngIf="activeTab === 'tareas'"
+      <app-tarea-list
+        *ngIf="activeTab === 'tareas'"
         [usuarioId]="selectedUsuario.id"
         [usuarios]="usuarios"
         (tareaChanged)="loadUsuarios()">
       </app-tarea-list>
 
       <!-- Tab: Historial -->
-      <app-tarea-reasignar *ngIf="activeTab === 'historial'"
+      <app-tarea-reasignar
+        *ngIf="activeTab === 'historial'"
         [usuarioId]="selectedUsuario.id">
       </app-tarea-reasignar>
 
