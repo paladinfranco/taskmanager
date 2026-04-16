@@ -1,5 +1,21 @@
 <div class="tarea-list-wrap">
-  <div class="list-header">
+
+  <!-- Filtros #5 -->
+  <div class="filter-bar">
+    <div class="filter-pills">
+      <button class="pill" [class.active]="filtro === 'todas'" (click)="setFiltro('todas')">
+        Todas
+        <span class="pill-count">{{ tareas.length }}</span>
+      </button>
+      <button class="pill" [class.active]="filtro === 'pendiente'" (click)="setFiltro('pendiente')">
+        Pendientes
+        <span class="pill-count warn">{{ tareas | filterByEstado:'pendiente' }}</span>
+      </button>
+      <button class="pill" [class.active]="filtro === 'completada'" (click)="setFiltro('completada')">
+        Completadas
+        <span class="pill-count ok">{{ tareas | filterByEstado:'completada' }}</span>
+      </button>
+    </div>
     <button class="btn btn-sm btn-primary" (click)="showForm = true">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -10,13 +26,41 @@
 
   <div *ngIf="loading" class="empty-state">Cargando tareas...</div>
 
-  <div *ngIf="!loading && tareas.length === 0" class="empty-state">
-    Sin tareas asignadas. ¡Crea la primera!
+  <!-- Empty state ilustrado #7 -->
+  <div *ngIf="!loading && tareas.length === 0" class="empty-illus">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+      <line x1="9" y1="12" x2="15" y2="12"/>
+      <line x1="9" y1="16" x2="13" y2="16"/>
+    </svg>
+    <p>Sin tareas asignadas</p>
+    <span>Crea la primera tarea para este usuario</span>
+    <button class="btn btn-sm btn-primary" style="margin-top:12px" (click)="showForm = true">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nueva tarea
+    </button>
   </div>
 
+  <div *ngIf="!loading && tareas.length > 0 && tareasFiltradas.length === 0" class="empty-illus">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <p>Sin resultados</p>
+    <span>No hay tareas {{ filtro === 'pendiente' ? 'pendientes' : 'completadas' }}</span>
+  </div>
+
+  <!-- Lista de tareas con línea lateral #3 y tooltips #9 -->
   <div class="task-items">
-    <div *ngFor="let t of tareas" class="task-item" [class.done]="t.estado === 'completada'">
-      <div class="task-check" [class.checked]="t.estado === 'completada'" (click)="toggle(t)">
+    <div *ngFor="let t of tareasFiltradas"
+         class="task-item"
+         [class.is-done]="t.estado === 'completada'"
+         [class.is-pending]="t.estado === 'pendiente'">
+      <div class="task-check"
+           [class.checked]="t.estado === 'completada'"
+           (click)="toggle(t)">
         <svg *ngIf="t.estado === 'completada'" width="9" height="9" viewBox="0 0 12 12" fill="none">
           <polyline points="2,6 5,9 10,3" stroke="white" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -25,28 +69,39 @@
         <span class="task-title">{{ t.titulo }}</span>
         <span class="task-desc" *ngIf="t.descripcion">{{ t.descripcion }}</span>
       </div>
-      <span class="badge" [class.badge-pendiente]="t.estado === 'pendiente'" [class.badge-completada]="t.estado === 'completada'">
+      <span class="badge"
+        [class.badge-pendiente]="t.estado === 'pendiente'"
+        [class.badge-completada]="t.estado === 'completada'">
         {{ t.estado }}
       </span>
       <div class="task-actions">
-        <button class="btn btn-icon" style="color:#6366f1;border-color:#a5b4fc" title="Reasignar" (click)="openReasignar(t)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/>
-            <path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/>
-          </svg>
-        </button>
-        <button class="btn btn-icon btn-danger" title="Eliminar" (click)="askDelete(t)">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-            <path d="M10 11v6"/><path d="M14 11v6"/>
-          </svg>
-        </button>
+        <!-- Tooltip reasignar #9 -->
+        <div class="tooltip-host">
+          <button class="btn btn-icon reassign-btn" (click)="openReasignar(t)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/>
+              <path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/>
+            </svg>
+          </button>
+          <span class="tooltip-text">Reasignar tarea</span>
+        </div>
+        <!-- Tooltip eliminar #9 -->
+        <div class="tooltip-host">
+          <button class="btn btn-icon btn-danger" (click)="askDelete(t)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+            </svg>
+          </button>
+          <span class="tooltip-text">Eliminar tarea</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<app-tarea-form *ngIf="showForm"
+<app-tarea-form
+  *ngIf="showForm"
   [usuarioId]="usuarioId"
   (saved)="onFormSaved()"
   (cancelled)="showForm = false">
@@ -60,7 +115,8 @@
   (cancelled)="confirmDelete = false">
 </app-confirm-dialog>
 
-<app-tarea-reasignar-modal *ngIf="showReasignar && tareaToReasignar"
+<app-tarea-reasignar-modal
+  *ngIf="showReasignar && tareaToReasignar"
   [tarea]="tareaToReasignar"
   [usuarios]="usuarios"
   (reasignado)="onReasignado()"

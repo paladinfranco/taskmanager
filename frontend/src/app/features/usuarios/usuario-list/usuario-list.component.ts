@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Usuario } from '../../../models/usuario.model';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
+import { AvatarColorService } from '../../../core/services/avatar-color.service';
 
 @Component({
   selector: 'app-usuario-list',
@@ -10,6 +11,8 @@ import { ToastService } from '../../../shared/components/toast/toast.service';
 })
 export class UsuarioListComponent implements OnInit {
   usuarios: Usuario[] = [];
+  filteredUsuarios: Usuario[] = [];
+  searchTerm = '';
   selectedUsuario: Usuario | null = null;
   showUsuarioForm = false;
   editingUsuario: Usuario | null = null;
@@ -21,7 +24,8 @@ export class UsuarioListComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private toast: ToastService
+    private toast: ToastService,
+    public avatarColor: AvatarColorService
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +37,7 @@ export class UsuarioListComponent implements OnInit {
     this.usuarioService.getAll().subscribe({
       next: (data) => {
         this.usuarios = data;
+        this.applyFilter();
         if (data.length > 0 && !this.selectedUsuario) {
           this.selectedUsuario = data[0];
         } else if (this.selectedUsuario) {
@@ -45,6 +50,21 @@ export class UsuarioListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term;
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const t = this.searchTerm.toLowerCase().trim();
+    this.filteredUsuarios = t
+      ? this.usuarios.filter(u =>
+          u.nombre.toLowerCase().includes(t) ||
+          u.ciudad?.toLowerCase().includes(t) ||
+          u.email.toLowerCase().includes(t))
+      : [...this.usuarios];
   }
 
   selectUsuario(u: Usuario): void {

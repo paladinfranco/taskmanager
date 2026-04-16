@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--bg-app);
+  overflow: hidden;
 }
 
 .topbar {
@@ -26,6 +26,7 @@
   display: grid;
   grid-template-columns: 230px 1fr;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -34,6 +35,7 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 .sidebar-header {
@@ -43,8 +45,42 @@
   letter-spacing: .07em;
   color: var(--text-hint);
   padding: 14px 14px 8px;
+  flex-shrink: 0;
 }
-.user-list { overflow-y: auto; flex: 1; }
+
+.search-box {
+  position: relative;
+  padding: 0 10px 8px;
+  flex-shrink: 0;
+  svg {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-60%);
+    color: var(--text-hint);
+    pointer-events: none;
+  }
+  input {
+    width: 100%;
+    padding: 6px 10px 6px 30px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-stat);
+    color: var(--text-primary);
+    outline: none;
+    font-family: var(--font);
+    transition: border-color var(--transition);
+    &:focus { border-color: var(--border-focus); }
+    &::placeholder { color: var(--text-hint); }
+  }
+}
+
+.user-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
 .user-row {
   display: flex;
   align-items: center;
@@ -58,8 +94,6 @@
 .avatar {
   width: 32px; height: 32px;
   border-radius: 50%;
-  background: #dbeafe;
-  color: #1d4ed8;
   font-size: 11px; font-weight: 600;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -68,6 +102,36 @@
 .user-info { flex: 1; min-width: 0; }
 .user-name { display: block; font-size: 12px; font-weight: 500; color: var(--text-primary); }
 .user-city { display: block; font-size: 10px; color: var(--text-secondary); }
+
+.pending-dot {
+  background: #f59e0b;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.empty-search {
+  padding: 16px 14px;
+  font-size: 11px;
+  color: var(--text-hint);
+  text-align: center;
+}
+
+.divider {
+  height: 0.5px;
+  background: var(--border);
+  margin: 8px 0;
+  flex-shrink: 0;
+}
+
 .add-user-btn {
   display: flex; align-items: center; gap: 7px;
   padding: 10px 14px;
@@ -77,14 +141,25 @@
   cursor: pointer;
   transition: background 0.15s;
   font-family: var(--font);
+  flex-shrink: 0;
   &:hover { background: var(--bg-hover); color: var(--text-primary); }
+}
+
+.right-col {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .content {
   padding: 20px 24px;
   overflow-y: auto;
   background: var(--bg-app);
+  flex: 1;
+  min-height: 0;
 }
+
 .content-header {
   display: flex; align-items: flex-start;
   justify-content: space-between;
@@ -100,7 +175,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .stat-card {
   background: var(--bg-card);
@@ -112,10 +187,25 @@
   display: block;
   font-size: 24px; font-weight: 600;
   color: var(--text-primary);
-  &.accent { color: var(--accent); }
+  &.accent  { color: var(--accent); }
   &.warning { color: #f59e0b; }
 }
 .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; display: block; }
+
+.progress-wrap { margin-bottom: 14px; }
+.progress-header {
+  display: flex; justify-content: space-between; margin-bottom: 5px;
+}
+.progress-label { font-size: 11px; color: var(--text-secondary); }
+.progress-pct   { font-size: 11px; font-weight: 600; color: #16a34a; }
+.progress-track {
+  height: 6px; background: var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: #16a34a;
+  border-radius: 3px; transition: width 0.4s ease;
+}
 
 .tabs-bar {
   display: flex; gap: 2px;
@@ -142,12 +232,12 @@
 }
 
 .app-footer {
-  background: var(--bg-topbar);
-  color: rgba(255,255,255,0.45);
+  background: var(--bg-sidebar);
+  color: var(--text-secondary);
   text-align: center;
   font-size: 12px;
   padding: 10px 20px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
   letter-spacing: 0.02em;
 }

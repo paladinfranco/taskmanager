@@ -4,6 +4,8 @@ import { Usuario } from '../../../models/usuario.model';
 import { TareaService } from '../../../core/services/tarea.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 
+type Filtro = 'todas' | 'pendiente' | 'completada';
+
 @Component({
   selector: 'app-tarea-list',
   templateUrl: './tarea-list.component.html',
@@ -15,6 +17,7 @@ export class TareaListComponent implements OnChanges {
   @Output() tareaChanged = new EventEmitter<void>();
 
   tareas: Tarea[] = [];
+  filtro: Filtro = 'todas';
   showForm = false;
   confirmDelete = false;
   tareaToDelete: Tarea | null = null;
@@ -41,10 +44,20 @@ export class TareaListComponent implements OnChanges {
     });
   }
 
+  get tareasFiltradas(): Tarea[] {
+    if (this.filtro === 'todas') return this.tareas;
+    return this.tareas.filter(t => t.estado === this.filtro);
+  }
+
+  setFiltro(f: Filtro): void { this.filtro = f; }
+
   toggle(t: Tarea): void {
     this.tareaService.toggleEstado(t.id).subscribe({
       next: () => {
-        this.toast.show(t.estado === 'pendiente' ? 'Tarea completada' : 'Tarea marcada como pendiente', 'success');
+        this.toast.show(
+          t.estado === 'pendiente' ? 'Tarea completada' : 'Tarea marcada como pendiente',
+          'success'
+        );
         this.loadTareas();
         this.tareaChanged.emit();
       },
@@ -77,5 +90,9 @@ export class TareaListComponent implements OnChanges {
     this.tareaChanged.emit();
   }
 
-  onFormSaved(): void { this.showForm = false; this.loadTareas(); this.tareaChanged.emit(); }
+  onFormSaved(): void {
+    this.showForm = false;
+    this.loadTareas();
+    this.tareaChanged.emit();
+  }
 }

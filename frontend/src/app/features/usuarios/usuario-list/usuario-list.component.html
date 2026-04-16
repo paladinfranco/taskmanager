@@ -1,6 +1,5 @@
 <div class="shell">
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="logo-box">
       <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
@@ -16,29 +15,49 @@
     <app-theme-toggle></app-theme-toggle>
   </div>
 
-  <!-- LAYOUT PRINCIPAL -->
   <div class="main-layout">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR — cubre todo el lado izquierdo hasta el fondo -->
     <aside class="sidebar">
       <div class="sidebar-header">Usuarios</div>
+
+      <div class="search-box">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar usuario..."
+          [value]="searchTerm"
+          (input)="onSearch($any($event.target).value)">
+      </div>
+
       <div class="user-list">
-        <div *ngFor="let u of usuarios"
+        <div *ngFor="let u of filteredUsuarios"
              class="user-row"
              [class.selected]="selectedUsuario?.id === u.id"
              (click)="selectUsuario(u)">
-          <div class="avatar">{{ getInitials(u.nombre) }}</div>
+          <div class="avatar" [ngStyle]="avatarColor.getStyle(u.nombre)">
+            {{ getInitials(u.nombre) }}
+          </div>
           <div class="user-info">
             <span class="user-name">{{ u.nombre }}</span>
             <span class="user-city">{{ u.ciudad }}</span>
           </div>
+          <span class="pending-dot" *ngIf="u.tareasPendientes > 0">
+            {{ u.tareasPendientes }}
+          </span>
           <span class="badge"
             [class.badge-activo]="u.estado === 'activo'"
             [class.badge-inactivo]="u.estado === 'inactivo'">
             {{ u.estado }}
           </span>
         </div>
+        <div class="empty-search" *ngIf="filteredUsuarios.length === 0 && searchTerm">
+          Sin resultados para "{{ searchTerm }}"
+        </div>
       </div>
+
       <div class="divider"></div>
       <button class="add-user-btn" (click)="openCreate()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -48,84 +67,103 @@
       </button>
     </aside>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="content" *ngIf="selectedUsuario; else noSelection">
+    <!-- COLUMNA DERECHA: contenido + footer -->
+    <div class="right-col">
 
-      <div class="content-header">
-        <div class="user-profile">
-          <div class="avatar avatar-lg">{{ getInitials(selectedUsuario.nombre) }}</div>
-          <div>
-            <h2 class="user-display-name">{{ selectedUsuario.nombre }}</h2>
-            <p class="user-meta">{{ selectedUsuario.email }} · {{ selectedUsuario.ciudad }}</p>
+      <main class="content" *ngIf="selectedUsuario; else noSelection">
+
+        <div class="content-header">
+          <div class="user-profile">
+            <div class="avatar avatar-lg" [ngStyle]="avatarColor.getStyle(selectedUsuario.nombre)">
+              {{ getInitials(selectedUsuario.nombre) }}
+            </div>
+            <div>
+              <h2 class="user-display-name">{{ selectedUsuario.nombre }}</h2>
+              <p class="user-meta">{{ selectedUsuario.email }} · {{ selectedUsuario.ciudad }}</p>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-sm" (click)="openEdit(selectedUsuario)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="askDelete(selectedUsuario)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+              </svg>
+              Eliminar
+            </button>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="btn btn-sm" (click)="openEdit(selectedUsuario)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            Editar
-          </button>
-          <button class="btn btn-sm btn-danger" (click)="askDelete(selectedUsuario)">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-              <path d="M10 11v6"/><path d="M14 11v6"/>
-            </svg>
-            Eliminar
-          </button>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-value">{{ selectedUsuario.totalTareas }}</span>
+            <span class="stat-label">Tareas totales</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value accent">{{ selectedUsuario.tareasCompletadas }}</span>
+            <span class="stat-label">Completadas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value warning">{{ selectedUsuario.tareasPendientes }}</span>
+            <span class="stat-label">Pendientes</span>
+          </div>
         </div>
-      </div>
 
-      <div class="stats-row">
-        <div class="stat-card">
-          <span class="stat-value">{{ selectedUsuario.totalTareas }}</span>
-          <span class="stat-label">Tareas totales</span>
+        <div class="progress-wrap" *ngIf="selectedUsuario.totalTareas > 0">
+          <div class="progress-header">
+            <span class="progress-label">Progreso</span>
+            <span class="progress-pct">
+              {{ (selectedUsuario.tareasCompletadas / selectedUsuario.totalTareas * 100) | number:'1.0-0' }}%
+            </span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill"
+              [style.width.%]="selectedUsuario.tareasCompletadas / selectedUsuario.totalTareas * 100">
+            </div>
+          </div>
         </div>
-        <div class="stat-card">
-          <span class="stat-value accent">{{ selectedUsuario.tareasCompletadas }}</span>
-          <span class="stat-label">Completadas</span>
+
+        <div class="tabs-bar">
+          <button class="tab-btn" [class.active]="activeTab === 'tareas'" (click)="activeTab = 'tareas'">Tareas</button>
+          <button class="tab-btn" [class.active]="activeTab === 'historial'" (click)="activeTab = 'historial'">Historial de reasignaciones</button>
         </div>
-        <div class="stat-card">
-          <span class="stat-value warning">{{ selectedUsuario.tareasPendientes }}</span>
-          <span class="stat-label">Pendientes</span>
-        </div>
-      </div>
 
-      <div class="tabs-bar">
-        <button class="tab-btn" [class.active]="activeTab === 'tareas'" (click)="activeTab = 'tareas'">Tareas</button>
-        <button class="tab-btn" [class.active]="activeTab === 'historial'" (click)="activeTab = 'historial'">Historial de reasignaciones</button>
-      </div>
+        <app-tarea-list
+          *ngIf="activeTab === 'tareas'"
+          [usuarioId]="selectedUsuario.id"
+          [usuarios]="usuarios"
+          (tareaChanged)="loadUsuarios()">
+        </app-tarea-list>
 
-      <app-tarea-list
-        *ngIf="activeTab === 'tareas'"
-        [usuarioId]="selectedUsuario.id"
-        [usuarios]="usuarios"
-        (tareaChanged)="loadUsuarios()">
-      </app-tarea-list>
+        <app-tarea-reasignar
+          *ngIf="activeTab === 'historial'"
+          [usuarioId]="selectedUsuario.id">
+        </app-tarea-reasignar>
 
-      <app-tarea-reasignar
-        *ngIf="activeTab === 'historial'"
-        [usuarioId]="selectedUsuario.id">
-      </app-tarea-reasignar>
-
-    </main>
-
-    <ng-template #noSelection>
-      <main class="content">
-        <div class="empty-state">Selecciona un usuario para ver sus tareas</div>
       </main>
-    </ng-template>
-  </div>
 
-  <!-- FOOTER -->
-  <footer class="app-footer">
-    Departamento de Inteligencia Artificial — {{ currentYear }}
-  </footer>
+      <ng-template #noSelection>
+        <main class="content">
+          <div class="empty-state">Selecciona un usuario para ver sus tareas</div>
+        </main>
+      </ng-template>
+
+      <!-- FOOTER solo en columna derecha -->
+      <footer class="app-footer">
+        Departamento de Inteligencia Artificial — {{ currentYear }}
+      </footer>
+
+    </div>
+  </div>
 
 </div>
 
-<!-- Modales -->
 <app-usuario-form
   *ngIf="showUsuarioForm"
   [usuario]="editingUsuario"

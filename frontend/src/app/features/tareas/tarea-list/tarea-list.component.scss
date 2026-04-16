@@ -1,15 +1,80 @@
 .tarea-list-wrap { display: flex; flex-direction: column; gap: 0; }
-.list-header { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font);
+  &.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    .pill-count { background: rgba(255,255,255,0.2); color: #fff; }
+  }
+  &:hover:not(.active) { background: var(--bg-hover); }
+}
+
+.pill-count {
+  background: var(--bg-stat);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 8px;
+  &.warn { background: #fef3c7; color: #92400e; }
+  &.ok   { background: #dcfce7; color: #15803d; }
+}
+
 .task-items { display: flex; flex-direction: column; gap: 7px; }
+
+/* #3 Línea lateral de color por estado */
 .task-item {
-  display: flex; align-items: center; gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 14px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  transition: opacity 0.2s;
-  &.done { opacity: 0.6; }
+  position: relative;
+  padding-left: 18px;
+  transition: opacity var(--transition);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  }
+  &.is-pending::before  { background: #f59e0b; }
+  &.is-done::before     { background: #16a34a; }
+  &.is-done             { opacity: 0.65; }
 }
+
 .task-check {
   width: 18px; height: 18px; border-radius: 50%;
   border: 2px solid var(--border-input);
@@ -18,10 +83,58 @@
   transition: all 0.15s;
   background: var(--bg-input);
   &.checked { background: var(--accent); border-color: var(--accent); }
-  &:hover { border-color: var(--accent); }
+  &:hover:not(.checked) { border-color: var(--accent); }
 }
+
 .task-body { flex: 1; min-width: 0; }
 .task-title { display: block; font-size: 13px; font-weight: 500; }
-.task-desc { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-.done .task-title { text-decoration: line-through; color: var(--text-secondary); }
+.task-desc  { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-done .task-title { text-decoration: line-through; color: var(--text-secondary); }
+
 .task-actions { display: flex; gap: 5px; }
+
+.reassign-btn { color: #6366f1 !important; border-color: #a5b4fc !important; }
+
+/* #7 Empty state ilustrado */
+.empty-illus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 16px;
+  color: var(--text-secondary);
+  text-align: center;
+  svg { opacity: 0.3; margin-bottom: 14px; }
+  p { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+  span { font-size: 12px; color: var(--text-hint); margin-top: 4px; }
+}
+
+/* #9 Tooltips */
+.tooltip-host {
+  position: relative;
+  display: inline-flex;
+  &:hover .tooltip-text { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+}
+.tooltip-text {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: #1a2332;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.15s;
+  pointer-events: none;
+  z-index: 100;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1a2332;
+  }
+}
